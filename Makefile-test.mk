@@ -60,7 +60,7 @@ E2E_K8S_VERSIONS ?= 1.28.13 1.29.8 1.30.4 1.31.0
 KIND_CLUSTER_NAME ?= kind
 
 GIT_TAG ?= $(shell git describe --tags --dirty --always)
-STAGING_IMAGE_REGISTRY := us-central1-docker.pkg.dev/k8s-staging-images
+STAGING_IMAGE_REGISTRY := us-central1-docker.pkg.dev/cohere-artifacts/cohere
 IMAGE_REGISTRY ?= $(STAGING_IMAGE_REGISTRY)/kueue
 IMAGE_NAME := kueue
 IMAGE_REPO ?= $(IMAGE_REGISTRY)/$(IMAGE_NAME)
