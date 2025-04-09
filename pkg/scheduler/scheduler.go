@@ -603,7 +603,7 @@ func (s *Scheduler) requeueAndUpdate(ctx context.Context, e entry) {
 		resourceRequestsIsChanged := workload.PropagateResourceRequests(patch, &e.Info)
 		if reservationIsChanged || resourceRequestsIsChanged {
 			log.V(3).Info("Patching workload status", "workload", klog.KObj(e.Obj), "clusterQueue", klog.KRef("", e.ClusterQueue), "queue", klog.KRef(e.Obj.Namespace, e.Obj.Spec.QueueName), "patch", fmt.Sprintf("%#+v\n", patch))
-			if err := workload.ApplyAdmissionStatusPatch(ctx, s.client, patch); err != nil {
+			if err := workload.ApplyAdmissionStatus(ctx, s.client, patch, true); err != nil {
 				log.Error(err, "Could not update Workload status")
 			}
 		}
