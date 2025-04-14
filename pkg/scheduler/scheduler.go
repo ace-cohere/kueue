@@ -594,10 +594,13 @@ func (s *Scheduler) requeueAndUpdate(ctx context.Context, e entry) {
 	log.V(2).Info("Workload re-queued", "workload", klog.KObj(e.Obj), "clusterQueue", klog.KRef("", e.ClusterQueue), "queue", klog.KRef(e.Obj.Namespace, e.Obj.Spec.QueueName), "requeueReason", e.requeueReason, "added", added, "status", e.status)
 
 	if e.status == notNominated || e.status == skipped {
-		reservationIsChanged := workload.UnsetQuotaReservationWithCondition(e.Obj, "Pending", e.inadmissibleMsg, s.clock.Now())
-		resourceRequestsIsChanged := workload.PropagateResourceRequests(e.Obj, &e.Info)
+		patch := workload.BaseSSAWorkload(e.Obj)
+		workload.AdmissionStatusPatch(e.Obj, patch, true)
+		workload.AdmissionChecksStatusPatch(e.Obj, patch)
+		reservationIsChanged := workload.UnsetQuotaReservationWithCondition(patch, "Pending", e.inadmissibleMsg, s.clock.Now())
+		resourceRequestsIsChanged := workload.PropagateResourceRequests(patch, &e.Info)
 		if reservationIsChanged || resourceRequestsIsChanged {
-			if err := workload.ApplyAdmissionStatus(ctx, s.client, e.Obj, true); err != nil {
+			if err := workload.ApplyAdmissionStatusPatch(ctx, s.client, patch); err != nil {
 				log.Error(err, "Could not update Workload status")
 			}
 		}
